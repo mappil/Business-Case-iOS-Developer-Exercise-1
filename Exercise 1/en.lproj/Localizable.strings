@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings
+  Exercise 1
+
+  Created by allegretti massimiliano on 14/04/24.
+  
+*/
+"Pokemon Box" = "Pokemon Box";
+"Search Pokemon" = "Search Pokemon";
+"Error" = "Error";
+"An error occurred. Check your internet connection and try again." = "An error occurred. Check your internet connection and try again.";
+"Ok" = "Ok";
+"Item not found" = "Item not found";
+"There is no Pokemon with this name. Check that you have written the name correctly." = "There is no Pokemon with this name. Check that you have written the name correctly.";
+"No Internet Connection" = "No Internet Connection";
+"Please check your internet connection and try again." = "Please check your internet connection and try again.";
