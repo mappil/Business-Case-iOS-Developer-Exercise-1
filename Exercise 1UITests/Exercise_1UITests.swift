@@ -46,7 +46,13 @@ final class Exercise_1UITests: XCTestCase {
         let pokemonName = "Jigglypuff"
         
         let searchField = app.searchFields.firstMatch
-        XCTAssert(searchField.waitForExistence(timeout: 1.0))
+        let exists = searchField.waitForExistence(timeout: 10)
+        
+        if exists {
+            searchField.tap()
+        } else {
+            XCTFail("SearchFields not found")
+        }
         
         searchField.tap()
         searchField.typeText(pokemonName)

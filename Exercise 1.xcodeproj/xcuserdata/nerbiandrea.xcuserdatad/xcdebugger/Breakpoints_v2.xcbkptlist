@@ -7,157 +7,81 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "409D80BA-0075-4C57-8BF0-918467B35499"
-            shouldBeEnabled = "Yes"
+            uuid = "936FA177-FE59-4F2B-A677-FBAA4A4D1B02"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "Exercise 1Tests/Exercise_1Tests.swift"
+            filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "108"
-            endingLineNumber = "108"
-            landmarkName = "testApiFetchMore()"
+            startingLineNumber = "50"
+            endingLineNumber = "50"
+            landmarkName = "fetch(type:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b251710d0a"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "88"
-                  endingLineNumber = "88"
-                  offsetFromSymbolStart = "608">
-               </Location>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b251710dd1"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "93"
-                  endingLineNumber = "93"
-                  offsetFromSymbolStart = "608">
-               </Location>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b251717230"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "94"
-                  endingLineNumber = "94"
-                  offsetFromSymbolStart = "608">
-               </Location>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b2517172fe"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "100"
-                  endingLineNumber = "100"
-                  offsetFromSymbolStart = "608">
-               </Location>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b2517173c1"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "109"
-                  endingLineNumber = "109"
-                  offsetFromSymbolStart = "608">
-               </Location>
-               <Location
-                  uuid = "409D80BA-0075-4C57-8BF0-918467B35499 - 4bb28b2517173e6"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1Tests.Exercise_1Tests.testApiFetchMore() throws -&gt; ()"
-                  moduleName = "Exercise 1Tests"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201Tests/Exercise_1Tests.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "108"
-                  endingLineNumber = "108"
-                  offsetFromSymbolStart = "608">
-               </Location>
-            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "6F7F3B54-38F0-47E3-8C58-E05884AE1531"
+            uuid = "81634FF0-DB9A-4A1F-8479-D6A3978EFFD9"
+            shouldBeEnabled = "No"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "120"
+            endingLineNumber = "120"
+            landmarkName = "fetchPokemonDetails(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "773A1622-9358-49C9-9ABA-6B95E0854B25"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "100"
+            endingLineNumber = "100"
+            landmarkName = "buildURL(for:)"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "5796D596-F69D-4013-870F-2D280A8D1294"
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Exercise 1/Controller/HomeViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "68"
-            endingLineNumber = "68"
+            startingLineNumber = "77"
+            endingLineNumber = "77"
             landmarkName = "fetch(type:)"
             landmarkType = "7">
-            <Locations>
-               <Location
-                  uuid = "6F7F3B54-38F0-47E3-8C58-E05884AE1531 - 9fd3eb6e4a0db085"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "Exercise_1.HomeViewController.fetch(type: Exercise_1.HomeViewModel.FetchType) -&gt; ()"
-                  moduleName = "Exercise 1"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201/Controller/HomeViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "68"
-                  endingLineNumber = "68"
-                  offsetFromSymbolStart = "124">
-               </Location>
-               <Location
-                  uuid = "6F7F3B54-38F0-47E3-8C58-E05884AE1531 - 5890bb2bf85dab9"
-                  shouldBeEnabled = "Yes"
-                  ignoreCount = "0"
-                  continueAfterRunningActions = "No"
-                  symbolName = "closure #1 (Swift.Result&lt;(), Swift.Error&gt;) -&gt; () in Exercise_1.HomeViewController.fetch(type: Exercise_1.HomeViewModel.FetchType) -&gt; ()"
-                  moduleName = "Exercise 1"
-                  usesParentBreakpointCondition = "Yes"
-                  urlString = "file:///Users/nerbiandrea/Exercise%201/Exercise%201/Controller/HomeViewController.swift"
-                  startingColumnNumber = "9223372036854775807"
-                  endingColumnNumber = "9223372036854775807"
-                  startingLineNumber = "68"
-                  endingLineNumber = "68"
-                  offsetFromSymbolStart = "228">
-               </Location>
-            </Locations>
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            uuid = "1C45ADA0-C437-43A8-9042-2C6E43A4B709"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "Exercise 1/Controller/HomeViewController.swift"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "69"
+            endingLineNumber = "69"
+            landmarkName = "fetch(type:)"
+            landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
    </Breakpoints>

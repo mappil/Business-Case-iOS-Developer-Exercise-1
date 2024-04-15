@@ -65,50 +65,61 @@ class HomeViewController: UIViewController {
     
     private func fetch(type: HomeViewModel.FetchType) {
         self.homeView.showLoading()
-        viewModel.fetch(type: type) { [weak self] result in
-            guard let strongSelf = self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    strongSelf.homeView.tableView.reloadData()
-                    
+        
+        viewModel.fetch(type: type)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("Fetch completed successfully.")
+                    self.homeView.tableView.reloadData()
                 case .failure(let error):
-                    if let homeError = error as? HomeViewModel.HomeError {
-                        switch homeError {
-                        case .emptyData:
-                            if type == .start {
-                                strongSelf.viewModel.showGenericErrorAlert(from: strongSelf)
-                            }
-                        case .invalidURL:
-                            strongSelf.viewModel.showGenericErrorAlert(from: strongSelf)
-                        case .concurrency:
-                            break
-                        case .noInternetConnection:
-                            strongSelf.viewModel.showNoInternetConnectionAlert(from: strongSelf)
-                            
-                        }
-                        
-                    }else {
-                        strongSelf.viewModel.showGenericErrorAlert(from: strongSelf)
-                    }
+                    print("Fetch failed with error: \(error.localizedDescription)")
+                    self.handleError(error)
                 }
-                strongSelf.homeView.hideLoading()
-            }
-        }
+                self.homeView.hideLoading()
+                
+            }, receiveValue: { _ in
+                
+            })
+            .store(in: &viewModel.cancellables)
     }
     
     private func search(text: String) {
-        viewModel.searchPokemon(name: text) { [weak self] result in
-            guard let strongSelf = self else { return }
-            DispatchQueue.main.async {
-                switch result {
-                case .success:
-                    strongSelf.homeView.tableView.reloadData()
+        viewModel.searchPokemon(name: text)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    print("Search completed successfully.")
+                    self.homeView.tableView.reloadData()
                 case .failure(let error):
-                    print(error.localizedDescription)
-                    strongSelf.viewModel.showItemNotFoundAlert(from: strongSelf)
+                    print("Search failed with error: \(error.localizedDescription)")
+                    self.viewModel.showItemNotFoundAlert(from: self)
                 }
+            }, receiveValue: { _ in
+                // Handle successful search
+            })
+            .store(in: &viewModel.cancellables)
+        
+    }
+    
+    private func handleError(_ error: Error) {
+        if let homeError = error as? NetworkError {
+            switch homeError {
+            case .emptyData:
+                viewModel.showGenericErrorAlert(from: self)
+            case .invalidURL:
+                viewModel.showGenericErrorAlert(from: self)
+            case .noInternetConnection:
+                viewModel.showNoInternetConnectionAlert(from: self)
+            case .concurrency:
+                break
+            default:
+                viewModel.showGenericErrorAlert(from: self)
             }
+        } else {
+            viewModel.showGenericErrorAlert(from: self)
         }
     }
 }
@@ -133,7 +144,8 @@ extension HomeViewController: UITableViewDelegate, UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
         let lastElement = dataSource.count - 1
-        if indexPath.row == lastElement {
+        if indexPath.row == lastElement,
+           !self.viewModel.inSearchMode(self.searchController) {
             self.fetch(type: .more)
         }
     }

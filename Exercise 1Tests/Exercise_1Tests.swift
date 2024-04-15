@@ -7,6 +7,7 @@
 
 import XCTest
 @testable import Exercise_1
+import Combine
 
 final class Exercise_1Tests: XCTestCase {
 
@@ -63,18 +64,20 @@ final class Exercise_1Tests: XCTestCase {
         
         let expectation = self.expectation(description: "Fetch start")
         
-        viewModel.fetch(type: .start) { result in
-            switch result {
-            case .success:
-                XCTAssertNotNil(viewModel.model.data)
-                XCTAssertNotNil(viewModel.model.data?.pokemon)
-                XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-            case .failure(let error):
-                XCTFail("Error: \(error.localizedDescription)")
-            }
-            
-            expectation.fulfill()
-        }
+         viewModel.fetch(type: .start)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    XCTAssertNotNil(viewModel.model.data)
+                    XCTAssertNotNil(viewModel.model.data?.pokemon)
+                    XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
+                case .failure(let error):
+                    XCTFail("Error: \(error.localizedDescription)")
+                }
+                expectation.fulfill()
+            }, receiveValue: { _ in })
+            .store(in: &viewModel.cancellables)
+        
         
         wait(for: [expectation], timeout: 10.0)
     }
@@ -87,34 +90,37 @@ final class Exercise_1Tests: XCTestCase {
         
         var pokemon: [Pokemon] = []
         
-        viewModel.fetch(type: .start) { result in
-            switch result {
-            case .success:
-                XCTAssertNotNil(viewModel.model.data)
-                XCTAssertNotNil(viewModel.model.data?.pokemon)
-                XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-                pokemon = viewModel.model.data?.pokemon ?? []
-            case .failure(let error):
-                XCTFail("Error: \(error.localizedDescription)")
-            }
-            
-            
-            viewModel.fetch(type: .more) { result in
-                switch result {
-                case .success:
+        viewModel.fetch(type: .start)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
                     XCTAssertNotNil(viewModel.model.data)
                     XCTAssertNotNil(viewModel.model.data?.pokemon)
                     XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-                    XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > pokemon.count)
+                    pokemon = viewModel.model.data?.pokemon ?? []
                 case .failure(let error):
                     XCTFail("Error: \(error.localizedDescription)")
                 }
+                expectation.fulfill()
                 
-                expectation2.fulfill()
-            }
-            
-            expectation.fulfill()
-        }
+                viewModel.fetch(type: .more)
+                    .sink(receiveCompletion: { completion in
+                        switch completion {
+                        case .finished:
+                            XCTAssertNotNil(viewModel.model.data)
+                            XCTAssertNotNil(viewModel.model.data?.pokemon)
+                            XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
+                            XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > pokemon.count)
+                        case .failure(let error):
+                            XCTFail("Error: \(error.localizedDescription)")
+                        }
+                        expectation2.fulfill()
+                        
+                    }, receiveValue: { _ in })
+                    .store(in: &viewModel.cancellables)
+                
+            }, receiveValue: { _ in })
+            .store(in: &viewModel.cancellables)
         
         wait(for: [expectation, expectation2], timeout: 10.0)
     }
@@ -125,18 +131,22 @@ final class Exercise_1Tests: XCTestCase {
         
         let expectation = self.expectation(description: "Fetch pokemon")
         let pokemonName = "Bulbasaur"
-        viewModel.searchPokemon(name: pokemonName) { result in
-            switch result {
-            case .success:
-                XCTAssertNotNil(viewModel.model.data)
-                XCTAssertNotNil(viewModel.model.data?.pokemon)
-                XCTAssertTrue(viewModel.model.data?.pokemon?.first?.name.lowercased() == pokemonName.lowercased())
-            case .failure(let error):
-                XCTFail("Error: \(error.localizedDescription)")
-            }
-            
-            expectation.fulfill()
-        }
+        
+        viewModel.searchPokemon(name: pokemonName)
+            .receive(on: DispatchQueue.main)
+            .sink(receiveCompletion: { completion in
+                switch completion {
+                case .finished:
+                    XCTAssertNotNil(viewModel.model.data)
+                    XCTAssertNotNil(viewModel.model.data?.pokemon)
+                    XCTAssertTrue(viewModel.model.data?.pokemon?.first?.name.lowercased() == pokemonName.lowercased())
+                case .failure(let error):
+                    XCTFail("Error: \(error.localizedDescription)")
+                }
+                expectation.fulfill()
+            }, receiveValue: { _ in })
+            .store(in: &viewModel.cancellables)
+
         
         wait(for: [expectation], timeout: 10.0)
     }

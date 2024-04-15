@@ -6,149 +6,154 @@
 //
 
 import UIKit
+import Combine
 
-class HomeViewModel {
-    var model = HomeModel()
+class HomeViewModel: ObservableObject {
+    @Published var model = HomeModel()
     
     private static let baseURLString = "https://pokeapi.co/api/v2/"
     private let baseURL = URL(string: baseURLString)!
     private let pokemonEndpoint = "pokemon/"
     
     private var isFetchingMore = false
+    var cancellables = Set<AnyCancellable>()
     
-    /// - Description: The function adds Pokémon to the model's list
-    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns a list of Pokémon names which through the pokemon's id the same API is called to obtain the details of the Pokemon
-    /// - Error: In case of error the function is completed with the result of failure and the related error
-    func fetch(type: HomeViewModel.FetchType,
-               completion: @escaping (Result<(), Error>) -> ()) {
-        var url: URL?
+    // MARK: - Fetch Functions
         
-        switch type {
-        case .start:
-            url = URL(string: "\(HomeViewModel.baseURLString)\(pokemonEndpoint)") // Use the "pokemon/" endpoint
-        case .more:
-            guard let nextURL = model.data?.next else {
-                completion(.failure(HomeError.emptyData))
-                return
-            }
-            url = nextURL
+    func fetch(type: FetchType) -> AnyPublisher<(), Error> {
+        guard let url = buildURL(for: type) else {
+            return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()
         }
-        
-        guard let taskURL = url else {
-            completion(.failure(HomeError.invalidURL))
-            return
-        }
-        
         
         guard !isFetchingMore else {
-            completion(.failure(HomeError.concurrency))
-            return
+            return Fail(error: NetworkError.concurrency).eraseToAnyPublisher()
         }
         
         isFetchingMore = true
-        self.fetchData(from:  taskURL) { [weak self] result in
-            switch result {
-            case .success(let data):
+        return fetchData(from: url)
+            .flatMap { [weak self] data -> AnyPublisher<(), Error> in
+                guard let self = self else {
+                    return Fail(error: NetworkError.selfDeallocated).eraseToAnyPublisher()
+                }
+                
                 do {
                     let decoder = JSONDecoder()
                     let pokemonModel: PokemonModel = try decoder.decode(PokemonModel.self, from: data)
                     
                     switch type {
                     case .start:
-                        self?.model.data = pokemonModel
+                        self.model.data = pokemonModel
                     case .more:
-                        self?.model.append(pokemonModel)
+                        self.model.append(pokemonModel)
                     }
                     
-                    self?.fetchPokemonDetails(for: self?.model.data?.pokemon ?? [], completion: { result in
-                        completion(.success)
-                    })
-                    
+                    return self.fetchPokemonDetails(for: self.model.data?.pokemon ?? [])
                 } catch {
-                    completion(.failure(error))
+                    return Fail(error: error).eraseToAnyPublisher()
                 }
-                
-                
-            case .failure(let error):
-                completion(.failure(error))
             }
-            self?.isFetchingMore = false
+            .handleEvents(receiveCompletion: { [weak self] _ in
+                self?.isFetchingMore = false
+            })
+            .eraseToAnyPublisher()
+    }
+    
+    func searchPokemon(name: String) -> AnyPublisher<Void, Error> {
+        guard let url = buildURL(for: .start)?.appendingPathComponent(name.lowercased()) else {
+            return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()
+        }
+        
+        return fetchData(from: url)
+            .tryMap { data -> PokemonDetail in
+                
+                let decoder = JSONDecoder()
+                return try decoder.decode(PokemonDetail.self, from: data)
+            }
+            .map { detail -> PokemonModel in
+                let pokemon = Pokemon(name: detail.name, url: url, detail: detail)
+                return PokemonModel(pokemon: pokemon)
+            }
+            .handleEvents(receiveOutput: { [weak self] pokemonModel in
+                self?.model.data = pokemonModel
+            })
+            .map { _ in () }
+            .eraseToAnyPublisher()
+    }
+
+    
+    func fetchPokemon(pokemon: Pokemon) -> AnyPublisher<PokemonDetail, Error> {
+        return fetchData(from: pokemon.url)
+            .tryMap { data -> PokemonDetail in
+                let decoder = JSONDecoder()
+                return try decoder.decode(PokemonDetail.self, from: data)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Helper Functions
+    
+    private func buildURL(for type: FetchType) -> URL? {
+        switch type {
+        case .start:
+            return URL(string: "\(HomeViewModel.baseURLString)\(pokemonEndpoint)")
+        case .more:
+            return model.data?.next
         }
     }
     
-    /// - Description: The function searches for a Pokémon by its name and inserts it into the model
-    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns Pokémon detail through the pokemon's name
-    /// - Error: In case of error the function is completed with the result of failure and the related error
-    func searchPokemon(name: String,
-                       completion: @escaping (Result<(), Error>) -> ()) {
-        
-        let url = URL(string: "\(HomeViewModel.baseURLString)\(pokemonEndpoint)\(name.lowercased())")
-        
-        guard let taskURL = url else {
-            completion(.failure(HomeError.invalidURL))
-            return
+    private func fetchData(from url: URL) -> AnyPublisher<Data, Error> {
+        guard Reachability.isConnectedToNetwork() else {
+            return Fail(error: NetworkError.noInternetConnection).eraseToAnyPublisher()
         }
         
-        self.fetchData(from:  taskURL) { [weak self] result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let detail = try decoder.decode(PokemonDetail.self, from: data)
-                    
-                    let pokemon = Pokemon(name: detail.name,
-                                          url: taskURL,
-                                          detail: detail)
-                    let pokemonModel = PokemonModel(pokemon: pokemon)
-                    self?.model.data = pokemonModel
-                    completion(.success)
-                    
-                } catch {
-                    completion(.failure(error))
+        return URLSession.shared.dataTaskPublisher(for: url)
+            .mapError { $0 as Error }
+            .map(\.data)
+            .eraseToAnyPublisher()
+    }
+    
+    private func fetchPokemonDetails(for pokemons: [Pokemon]) -> AnyPublisher<(), Error> {
+        return pokemons.publisher
+            .flatMap { self.fetchPokemon(pokemon: $0) }
+            .map { pokemonDetail -> Void in
+                if let index = self.model.data?.pokemon?.firstIndex(where: { $0.name == pokemonDetail.name }) {
+                    self.model.data?.pokemon?[index].setDetail(pokemonDetail)
                 }
-            case .failure(let error):
-                completion(.failure(error))
-                
             }
+            .collect()
+            .map { _ in }
+            .eraseToAnyPublisher()
+    }
+    
+    // MARK: - Error Handling
+    
+    func handleAPIError(error: Error, from controller: UIViewController) {
+        if let homeError = error as? NetworkError {
+            switch homeError {
+            case .invalidURL:
+                showGenericErrorAlert(from: controller)
+            case .concurrency:
+                // Handle concurrency error
+                break
+            case .noInternetConnection:
+                showNoInternetConnectionAlert(from: controller)
+            case .selfDeallocated:
+                // Handle self deallocated error
+                break
+            default:
+                showGenericErrorAlert(from: controller)
+            }
+        } else {
+            // Handle other types of errors
+            showGenericErrorAlert(from: controller)
         }
     }
     
-    /// - Description: The function obtains the details of a Pokémon through the URL obtained from the list
-    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns the Pokémon's detail through the Pokémon's id
-    /// - Error: In case of error the function is completed with the result of failure and the related error
-    func fetchPokemon(pokemon: Pokemon,
-                      completion: @escaping (Result<PokemonDetail, Error>) -> ()) {
-        self.fetchData(from:  pokemon.url) { result in
-            switch result {
-            case .success(let data):
-                do {
-                    let decoder = JSONDecoder()
-                    let detail = try decoder.decode(PokemonDetail.self, from: data)
-                    
-                    completion(.success(detail))
-                    
-                } catch {
-                    completion(.failure(error))
-                }
-            case .failure(let error):
-                completion(.failure(error))
-            }
-        }
-    }
+    // MARK: - Alerts
     
     func showGenericErrorAlert(from controller: UIViewController) {
         let alert = UIAlertController(title: NSLocalizedString("Error", comment: ""),
                                       message: NSLocalizedString("An error occurred. Check your internet connection and try again.", comment: ""),
-                                      preferredStyle: .alert)
-        let cancelAction = UIAlertAction(title: NSLocalizedString("Ok", comment: ""), 
-                                         style: .cancel)
-        alert.addAction(cancelAction)
-        controller.present(alert, animated: true)
-    }
-    
-    func showItemNotFoundAlert(from controller: UIViewController) {
-        let alert = UIAlertController(title: NSLocalizedString("Item not found", comment: ""),
-                                      message: NSLocalizedString("There is no Pokemon with this name. Check that you have written the name correctly.", comment: ""),
                                       preferredStyle: .alert)
         let cancelAction = UIAlertAction(title: NSLocalizedString("Ok", comment: ""),
                                          style: .cancel)
@@ -166,71 +171,26 @@ class HomeViewModel {
         controller.present(alert, animated: true, completion: nil)
     }
     
-    // MARK: Private funcs
-    
-    private func fetchPokemonDetails(for pokemons: [Pokemon], completion: @escaping (Result<(), Error>) -> Void) {
-        let dispatchQueue = DispatchQueue(label: "PokemonDetailQueue", attributes: .concurrent)
-        let dispatchGroup = DispatchGroup()
-        
-        for pokemon in pokemons {
-            dispatchGroup.enter()
-            
-            fetchPokemon(pokemon: pokemon) { result in
-                switch result {
-                case .success(let detail):
-                    pokemon.setDetail(detail)
-                case .failure:
-                    break
-                }
-                
-                dispatchGroup.leave()
-            }
-        }
-        
-        dispatchGroup.notify(queue: dispatchQueue) {
-            completion(.success(()))
-        }
+    func showItemNotFoundAlert(from controller: UIViewController) {
+        let alert = UIAlertController(title: NSLocalizedString("Item not found", comment: ""),
+                                      message: NSLocalizedString("There is no Pokemon with this name. Check that you have written the name correctly.", comment: ""),
+                                      preferredStyle: .alert)
+        let cancelAction = UIAlertAction(title: NSLocalizedString("Ok", comment: ""), style: .cancel)
+        alert.addAction(cancelAction)
+        controller.present(alert, animated: true)
     }
 }
 
-// MARK: - Network call management
+// MARK: - Search
 extension HomeViewModel {
     
-    private func fetchData(from url: URL, completion: @escaping (Result<Data, Error>) -> Void) {
-        guard Reachability.isConnectedToNetwork() else {
-            completion(.failure(HomeError.noInternetConnection))
-            return
-        }
+    func inSearchMode(_ searchController: UISearchController) -> Bool {
+        let isActive = searchController.isActive
+        let searchText = searchController.searchBar.text ?? ""
         
-        URLSession.shared.dataTask(with: url) { (data, response, error) in
-            if let error = error {
-                completion(.failure(error))
-                return
-            }
-            
-            guard let data = data else {
-                completion(.failure(HomeError.emptyData))
-                return
-            }
-            
-            completion(.success(data))
-        }.resume()
+        return isActive && !searchText.isEmpty
     }
     
-    private func decode<T: Decodable>(_ type: T.Type, from data: Data) throws -> T {
-        let decoder = JSONDecoder()
-        return try decoder.decode(type, from: data)
-    }
-}
-
-// MARK: - Error
-extension HomeViewModel {
-    enum HomeError: Error {
-        case emptyData
-        case invalidURL
-        case concurrency
-        case noInternetConnection
-    }
 }
 
 // MARK: - Fetch Type
@@ -240,3 +200,31 @@ extension HomeViewModel {
         case more
     }
 }
+
+// MARK: - Error
+enum NetworkError: Error {
+    case emptyData
+    case invalidURL
+    case concurrency
+    case noInternetConnection
+    case selfDeallocated
+}
+
+extension NetworkError: LocalizedError {
+    var errorDescription: String? {
+        switch self {
+        case .emptyData:
+            return NSLocalizedString("Empty data received from the server.", comment: "")
+        case .invalidURL:
+            return NSLocalizedString("The URL provided is invalid.", comment: "")
+        case .concurrency:
+            return NSLocalizedString("Multiple network requests are not allowed concurrently.", comment: "")
+        case .noInternetConnection:
+            return NSLocalizedString("No internet connection available.", comment: "")
+        case .selfDeallocated:
+            return NSLocalizedString("The object has been deallocated.", comment: "")
+        }
+    }
+}
+
+
