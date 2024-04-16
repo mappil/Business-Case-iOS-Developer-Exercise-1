@@ -59,96 +59,41 @@ final class Exercise_1Tests: XCTestCase {
     
     // MARK: Api
     
-    func testApiFetchStart() throws {
+    func testApiFetchStart() async throws {
         let viewModel = HomeViewModel()
-        
-        let expectation = self.expectation(description: "Fetch start")
-        
-         viewModel.fetch(type: .start)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    XCTAssertNotNil(viewModel.model.data)
-                    XCTAssertNotNil(viewModel.model.data?.pokemon)
-                    XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-                case .failure(let error):
-                    XCTFail("Error: \(error.localizedDescription)")
-                }
-                expectation.fulfill()
-            }, receiveValue: { _ in })
-            .store(in: &viewModel.cancellables)
-        
-        
-        wait(for: [expectation], timeout: 10.0)
+        try await viewModel.fetch(type: .start)
+        XCTAssertNotNil(viewModel.model.data)
+        XCTAssertNotNil(viewModel.model.data?.pokemon)
+        XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
+                
     }
     
-    func testApiFetchMore() throws {
+    func testApiFetchMore() async throws {
         let viewModel = HomeViewModel()
-        
-        let expectation = self.expectation(description: "Fetch start")
-        let expectation2 = self.expectation(description: "Fetch more")
-        
         var pokemon: [Pokemon] = []
         
-        viewModel.fetch(type: .start)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    XCTAssertNotNil(viewModel.model.data)
-                    XCTAssertNotNil(viewModel.model.data?.pokemon)
-                    XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-                    pokemon = viewModel.model.data?.pokemon ?? []
-                case .failure(let error):
-                    XCTFail("Error: \(error.localizedDescription)")
-                }
-                expectation.fulfill()
-                
-                viewModel.fetch(type: .more)
-                    .sink(receiveCompletion: { completion in
-                        switch completion {
-                        case .finished:
-                            XCTAssertNotNil(viewModel.model.data)
-                            XCTAssertNotNil(viewModel.model.data?.pokemon)
-                            XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
-                            XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > pokemon.count)
-                        case .failure(let error):
-                            XCTFail("Error: \(error.localizedDescription)")
-                        }
-                        expectation2.fulfill()
-                        
-                    }, receiveValue: { _ in })
-                    .store(in: &viewModel.cancellables)
-                
-            }, receiveValue: { _ in })
-            .store(in: &viewModel.cancellables)
+        try await viewModel.fetch(type: .start)
+        XCTAssertNotNil(viewModel.model.data)
+        XCTAssertNotNil(viewModel.model.data?.pokemon)
+        XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
+        pokemon = viewModel.model.data?.pokemon ?? []
         
-        wait(for: [expectation, expectation2], timeout: 10.0)
+        try await viewModel.fetch(type: .more)
+        XCTAssertNotNil(viewModel.model.data)
+        XCTAssertNotNil(viewModel.model.data?.pokemon)
+        XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > 0)
+        XCTAssertTrue((viewModel.model.data?.pokemon?.count ?? 0) > pokemon.count)
     }
     
     
-    func testApiSearchPokemon() throws {
+    func testApiSearchPokemon() async throws {
         let viewModel = HomeViewModel()
-        
-        let expectation = self.expectation(description: "Fetch pokemon")
         let pokemonName = "Bulbasaur"
         
-        viewModel.searchPokemon(name: pokemonName)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    XCTAssertNotNil(viewModel.model.data)
-                    XCTAssertNotNil(viewModel.model.data?.pokemon)
-                    XCTAssertTrue(viewModel.model.data?.pokemon?.first?.name.lowercased() == pokemonName.lowercased())
-                case .failure(let error):
-                    XCTFail("Error: \(error.localizedDescription)")
-                }
-                expectation.fulfill()
-            }, receiveValue: { _ in })
-            .store(in: &viewModel.cancellables)
-
-        
-        wait(for: [expectation], timeout: 10.0)
+        try await viewModel.searchPokemon(name: pokemonName)
+        XCTAssertNotNil(viewModel.model.data)
+        XCTAssertNotNil(viewModel.model.data?.pokemon)
+        XCTAssertTrue(viewModel.model.data?.pokemon?.first?.name.lowercased() == pokemonName.lowercased())
     }
     
 }

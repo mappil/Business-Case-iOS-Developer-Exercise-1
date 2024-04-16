@@ -65,43 +65,30 @@ class HomeViewController: UIViewController {
     
     private func fetch(type: HomeViewModel.FetchType) {
         self.homeView.showLoading()
-        
-        viewModel.fetch(type: type)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("Fetch completed successfully.")
-                    self.homeView.tableView.reloadData()
-                case .failure(let error):
-                    print("Fetch failed with error: \(error.localizedDescription)")
-                    self.handleError(error)
-                }
-                self.homeView.hideLoading()
-                
-            }, receiveValue: { _ in
-                
-            })
-            .store(in: &viewModel.cancellables)
+        Task {
+            do {
+                try await viewModel.fetch(type: type)
+                print("Fetch completed successfully.")
+                self.homeView.tableView.reloadData()
+            }catch {
+                print("Fetch failed with error: \(error.localizedDescription)")
+                self.handleError(error)
+            }
+            self.homeView.hideLoading()
+        }
     }
     
     private func search(text: String) {
-        viewModel.searchPokemon(name: text)
-            .receive(on: DispatchQueue.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    print("Search completed successfully.")
-                    self.homeView.tableView.reloadData()
-                case .failure(let error):
-                    print("Search failed with error: \(error.localizedDescription)")
-                    self.viewModel.showItemNotFoundAlert(from: self)
-                }
-            }, receiveValue: { _ in
-                // Handle successful search
-            })
-            .store(in: &viewModel.cancellables)
-        
+        Task {
+            do {
+                try await viewModel.searchPokemon(name: text)
+                print("Search completed successfully.")
+                self.homeView.tableView.reloadData()
+            }catch {
+                print("Search failed with error: \(error.localizedDescription)")
+                self.viewModel.showItemNotFoundAlert(from: self)
+            }
+        }
     }
     
     private func handleError(_ error: Error) {
@@ -171,6 +158,8 @@ extension HomeViewController: UISearchResultsUpdating, UISearchControllerDelegat
     }
     
     func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
-        self.fetch(type: .start)
+        if viewModel.model.data?.pokemon?.count == 1 {
+            self.fetch(type: .start)
+        }
     }
 }

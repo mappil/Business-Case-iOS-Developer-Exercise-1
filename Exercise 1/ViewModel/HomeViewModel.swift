@@ -9,27 +9,75 @@ import UIKit
 import Combine
 
 class HomeViewModel: ObservableObject {
-    @Published var model = HomeModel()
+    var model = HomeModel()
     
     private static let baseURLString = "https://pokeapi.co/api/v2/"
     private let baseURL = URL(string: baseURLString)!
     private let pokemonEndpoint = "pokemon/"
     
     private var isFetchingMore = false
-    var cancellables = Set<AnyCancellable>()
+    private var cancellables = Set<AnyCancellable>()
     
     // MARK: - Fetch Functions
-        
-    func fetch(type: FetchType) -> AnyPublisher<(), Error> {
+    
+    func fetch(type: FetchType) async throws -> Void {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            
+            guard !isFetchingMore else {
+                continuation.resume(throwing: NetworkError.concurrency)
+                return
+            }
+            
+            isFetchingMore = true
+            
+            fetchDataAndProcess(type: type)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: ())
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }, receiveValue: { _ in })
+                .store(in: &cancellables)
+        }
+    }
+    
+    func searchPokemon(name: String) async throws -> Void {
+        try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
+            
+            fetchSearchPokemon(name: name)
+                .receive(on: DispatchQueue.main)
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        continuation.resume(returning: ())
+                    case .failure(let error):
+                        continuation.resume(throwing: error)
+                    }
+                }, receiveValue: { _ in })
+                .store(in: &cancellables)
+        }
+    }
+    
+    
+    // MARK: - Private Functions
+    
+    private func fetchPokemon(pokemon: Pokemon) -> AnyPublisher<PokemonDetail, Error> {
+        return fetchData(from: pokemon.url)
+            .tryMap { data -> PokemonDetail in
+                let decoder = JSONDecoder()
+                return try decoder.decode(PokemonDetail.self, from: data)
+            }
+            .eraseToAnyPublisher()
+    }
+    
+    private func fetchDataAndProcess(type: FetchType) -> AnyPublisher<(), Error> {
         guard let url = buildURL(for: type) else {
             return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()
         }
         
-        guard !isFetchingMore else {
-            return Fail(error: NetworkError.concurrency).eraseToAnyPublisher()
-        }
-        
-        isFetchingMore = true
         return fetchData(from: url)
             .flatMap { [weak self] data -> AnyPublisher<(), Error> in
                 guard let self = self else {
@@ -58,7 +106,7 @@ class HomeViewModel: ObservableObject {
             .eraseToAnyPublisher()
     }
     
-    func searchPokemon(name: String) -> AnyPublisher<Void, Error> {
+    private func fetchSearchPokemon(name: String) -> AnyPublisher<Void, Error> {
         guard let url = buildURL(for: .start)?.appendingPathComponent(name.lowercased()) else {
             return Fail(error: NetworkError.invalidURL).eraseToAnyPublisher()
         }
@@ -77,16 +125,6 @@ class HomeViewModel: ObservableObject {
                 self?.model.data = pokemonModel
             })
             .map { _ in () }
-            .eraseToAnyPublisher()
-    }
-
-    
-    func fetchPokemon(pokemon: Pokemon) -> AnyPublisher<PokemonDetail, Error> {
-        return fetchData(from: pokemon.url)
-            .tryMap { data -> PokemonDetail in
-                let decoder = JSONDecoder()
-                return try decoder.decode(PokemonDetail.self, from: data)
-            }
             .eraseToAnyPublisher()
     }
     

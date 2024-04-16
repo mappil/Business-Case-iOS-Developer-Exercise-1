@@ -7,22 +7,6 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "936FA177-FE59-4F2B-A677-FBAA4A4D1B02"
-            shouldBeEnabled = "No"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "50"
-            endingLineNumber = "50"
-            landmarkName = "fetch(type:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
             uuid = "81634FF0-DB9A-4A1F-8479-D6A3978EFFD9"
             shouldBeEnabled = "No"
             ignoreCount = "0"
@@ -30,8 +14,8 @@
             filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "120"
-            endingLineNumber = "120"
+            startingLineNumber = "158"
+            endingLineNumber = "158"
             landmarkName = "fetchPokemonDetails(for:)"
             landmarkType = "7">
          </BreakpointContent>
@@ -46,40 +30,56 @@
             filePath = "Exercise 1/ViewModel/HomeViewModel.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "100"
-            endingLineNumber = "100"
+            startingLineNumber = "138"
+            endingLineNumber = "138"
             landmarkName = "buildURL(for:)"
             landmarkType = "7">
+            <Locations>
+               <Location
+                  uuid = "773A1622-9358-49C9-9ABA-6B95E0854B25 - a2f30326fc15d3fc"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Exercise_1.HomeViewModel.buildURL(for: Exercise_1.HomeViewModel.FetchType) -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  moduleName = "Exercise 1"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/nerbiandrea/Business-Case-iOS-Developer-Exercise-1/Exercise%201/ViewModel/HomeViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "100"
+                  endingLineNumber = "100"
+                  offsetFromSymbolStart = "636">
+               </Location>
+               <Location
+                  uuid = "773A1622-9358-49C9-9ABA-6B95E0854B25 - a2f30326fc15e8c6"
+                  shouldBeEnabled = "Yes"
+                  ignoreCount = "0"
+                  continueAfterRunningActions = "No"
+                  symbolName = "Exercise_1.HomeViewModel.buildURL(for: Exercise_1.HomeViewModel.FetchType) -&gt; Swift.Optional&lt;Foundation.URL&gt;"
+                  moduleName = "Exercise 1"
+                  usesParentBreakpointCondition = "Yes"
+                  urlString = "file:///Users/nerbiandrea/Business-Case-iOS-Developer-Exercise-1/Exercise%201/ViewModel/HomeViewModel.swift"
+                  startingColumnNumber = "9223372036854775807"
+                  endingColumnNumber = "9223372036854775807"
+                  startingLineNumber = "138"
+                  endingLineNumber = "138"
+                  offsetFromSymbolStart = "664">
+               </Location>
+            </Locations>
          </BreakpointContent>
       </BreakpointProxy>
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            uuid = "5796D596-F69D-4013-870F-2D280A8D1294"
-            shouldBeEnabled = "Yes"
+            uuid = "3E982B01-107E-439A-8F26-CFE0A98D8F6E"
+            shouldBeEnabled = "No"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "Exercise 1/Controller/HomeViewController.swift"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "77"
-            endingLineNumber = "77"
-            landmarkName = "fetch(type:)"
-            landmarkType = "7">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            uuid = "1C45ADA0-C437-43A8-9042-2C6E43A4B709"
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "Exercise 1/Controller/HomeViewController.swift"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "69"
-            endingLineNumber = "69"
+            startingLineNumber = "67"
+            endingLineNumber = "67"
             landmarkName = "fetch(type:)"
             landmarkType = "7">
          </BreakpointContent>
