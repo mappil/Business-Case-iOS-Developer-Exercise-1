@@ -23,17 +23,18 @@ As a starting point you are provided with UI mockups of the pokemon list.
 - URLSession
 - JSON decoding
 - MVVM (Model-View-ViewModel) design pattern
+- Async and Await for asynchronous programming
 - Reachability for internet connection management
 
 ## Function Usage
 
-### `func fetch(type: HomeViewModel.FetchType, completion: @escaping (Result<(), Error>) -> ())`
+### `func fetch(type: FetchType) async throws -> Void`
 This function is used to retrieve a list of Pokémon from the Pokémon API. It takes the fetch type as input, which can be `.start` to initiate a new search or `.more` to load additional Pokémon from the existing list. The completion handler returns a `Result` object indicating whether the operation was completed successfully or if an error occurred.
 
-### `func searchPokemon(name: String, completion: @escaping (Result<(), Error>) -> ())`
+### `func searchPokemon(name: String) async throws -> Void`
 This function is used to search for a Pokémon by name in the Pokémon API. It takes the name of the Pokémon to search for as input and a completion handler that returns a `Result` object indicating whether the search was completed successfully or if an error occurred.
 
-### `func fetchPokemon(pokemon: Pokemon, completion: @escaping (Result<PokemonDetail, Error>) -> ())`
+### `private func fetchPokemon(pokemon: Pokemon) -> AnyPublisher<PokemonDetail, Error>`
 This function is used to retrieve the details of a specific Pokémon from the Pokémon API. It takes a `Pokemon` object as input and a completion handler that returns a `Result` object containing the details of the Pokémon or an error, if one occurred.
 
 ## Unit Test:

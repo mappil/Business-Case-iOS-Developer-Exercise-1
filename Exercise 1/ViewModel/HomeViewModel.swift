@@ -20,6 +20,9 @@ class HomeViewModel: ObservableObject {
     
     // MARK: - Fetch Functions
     
+    /// - Description: The function adds Pokémon to the model's list
+    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns a list of Pokémon names which through the pokemon's id the same API is called to obtain the details of the Pokemon
+    /// - Error: In case of error the function is completed with the result of failure and the related error
     func fetch(type: FetchType) async throws -> Void {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             
@@ -44,6 +47,9 @@ class HomeViewModel: ObservableObject {
         }
     }
     
+    /// - Description: The function searches for a Pokémon by its name and inserts it into the model
+    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns Pokémon detail through the pokemon's name
+    /// - Error: In case of error the function is completed with the result of failure and the related error
     func searchPokemon(name: String) async throws -> Void {
         try await withCheckedThrowingContinuation { (continuation: CheckedContinuation<Void, Error>) in
             
@@ -64,6 +70,9 @@ class HomeViewModel: ObservableObject {
     
     // MARK: - Private Functions
     
+    /// - Description: The function obtains the details of a Pokémon through the URL obtained from the list
+    /// [Pokémon API](https://pokeapi.co/docs/v2#pokemon) returns the Pokémon's detail through the Pokémon's id
+    /// - Error: In case of error the function is completed with the result of failure and the related error
     private func fetchPokemon(pokemon: Pokemon) -> AnyPublisher<PokemonDetail, Error> {
         return fetchData(from: pokemon.url)
             .tryMap { data -> PokemonDetail in
