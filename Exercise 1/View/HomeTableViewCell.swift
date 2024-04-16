@@ -128,7 +128,7 @@ class HomeTableViewCell: UITableViewCell {
         if let imageURL = self.pokemon?.detail?.officialArtworkImageURL {
             imageViewPhoto.downloaded(from: imageURL)
         }else {
-            imageViewPhoto.image = UIImage(systemName: "heart.fill")
+            imageViewPhoto.image = UIImage(systemName: "photo.artframe.circle.fill")
         }
         titleLabel.text = pokemon?.name.capitalized
         // TODO: implement the description
